@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#0A131D"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp"
+        android:gravity="center_horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="CatGirl Clock"
+            android:textColor="#FFFFFF"
+            android:textSize="26sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="20dp" />
+
+        <!-- Guia de Recursos -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="#132235"
+            android:padding="16dp"
+            android:layout_marginBottom="20dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="📌 Guia de Uso"
+                android:textColor="#64DFDF"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="• Widgets (4x1 / 2x1 / 4x2): Pressione e segure na tela inicial para adicionar. O modelo 4x2 inclui a data completa.\n\n• Modo de Carga (Daydream): Exibe o relógio escurecido em tela cheia enquanto o dispositivo estiver carregando."
+                android:textColor="#C1CBD7"
+                android:textSize="13sp"
+                android:lineSpacingExtra="3dp" />
+        </LinearLayout>
+
+        <!-- Botões de Ação -->
+        <Button
+            android:id="@+id/btn_screensaver"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Configurar Modo de Carga (Daydream)"
+            android:backgroundTint="#1D3557"
+            android:textColor="#FFFFFF"
+            android:layout_marginBottom="10dp" />
+
+        <Button
+            android:id="@+id/btn_add_widget"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Adicionar Widget à Tela Inicial"
+            android:backgroundTint="#1D3557"
+            android:textColor="#FFFFFF"
+            android:layout_marginBottom="20dp" />
+
+        <!-- Seção do Toggle com Aviso Integrado -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="#161B22"
+            android:padding="14dp"
+            android:layout_marginBottom="24dp">
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/switch_hide_icon"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Ocultar ícone do app no menu"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="⚠️ Importante: Ao ocultar, o aplicativo sumirá da sua lista de apps. Para abrir esta tela novamente no futuro, vá em Configurações do Celular > Aplicativos > CatGirl Clock e clique em 'Abrir'."
+                android:textColor="#E0A96D"
+                android:textSize="12sp"
+                android:layout_marginTop="8dp" />
+        </LinearLayout>
+
+        <!-- Seção PIX -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="╔═════════════•⊱✦⊰•═════════════╗\n  Me manda um pix?     ฅ^&gt;⩊&lt;^ ฅ\n╚═════════════•⊱✦⊰•═════════════╝"
+            android:textColor="#64DFDF"
+            android:textSize="13sp"
+            android:textAlignment="center"
+            android:fontFamily="monospace"
+            android:layout_marginBottom="16dp" />
+
+        <ImageView
+            android:id="@+id/qr_code_image"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:src="@drawable/pix_qr"
+            android:contentDescription="QR Code PIX"
+            android:scaleType="fitCenter"
+            android:layout_marginBottom="16dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="✰+˚. * Somos o Universo! *+˚✧"
+            android:textColor="#8E9AAF"
+            android:textSize="14sp"
+            android:textStyle="italic" />
+
+    </LinearLayout>
+</ScrollView>
