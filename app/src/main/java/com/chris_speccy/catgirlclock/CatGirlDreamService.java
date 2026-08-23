@@ -1,132 +1,100 @@
 package com.chris_speccy.catgirlclock;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.graphics.Color;
+import android.os.Handler;
+import android.os.Looper;
 import android.service.dreams.DreamService;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.ViewFlipper;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 
 public class CatGirlDreamService extends DreamService {
 
-    // Atualiza o relógio automaticamente a cada virada de minuto do sistema
-    private final BroadcastReceiver timeReceiver = new BroadcastReceiver() {
+    private ImageView imgH1, imgH2, imgM1, imgM2;
+    private TextView textDate, textColon;
+    private final Handler handler = new Handler(Looper.getMainLooper());
+
+    // Mapeamento individual de quadros para cada número (0 a 9)
+    private final int[] FRAME_COUNTS = {10, 9, 9, 12, 10, 8, 9, 9, 6, 8};
+    private final int[] frameIndices = new int[4];
+
+    private boolean colonVisible = true;
+
+    private final Runnable animationRunnable = new Runnable() {
         @Override
-        public void onReceive(Context context, Intent intent) {
-            updateTime();
+        public void run() {
+            atualizarRelogioEAnimacao();
+            handler.postDelayed(this, 220); // Velocidade da animação em milissegundos
         }
     };
 
     @Override
     public void onAttachedToWindow() {
         super.onAttachedToWindow();
+
         setInteractive(false);
         setFullscreen(true);
-
-        // Carrega o layout 4x2 original (com a data)
+        setScreenBright(false); // Ativa o brilho baixo noturno para carregamento
         setContentView(R.layout.widget_clock);
 
-        // Aplica a máscara noturna via código
-        View root = findViewById(R.id.widget_root);
-        if (root != null) {
-            root.setBackgroundColor(Color.BLACK); // Fundo totalmente preto
-            root.setAlpha(0.45f); // Opacidade de 45% (ajuste conforme preferir)
-        }
-
-        updateTime();
-        registerReceiver(timeReceiver, new IntentFilter(Intent.ACTION_TIME_TICK));
+        imgH1 = findViewById(R.id.digit_h1);
+        imgH2 = findViewById(R.id.digit_h2);
+        imgM1 = findViewById(R.id.digit_m1);
+        imgM2 = findViewById(R.id.digit_m2);
+        textDate = findViewById(R.id.text_date);
+        textColon = findViewById(R.id.text_colon);
     }
 
     @Override
     public void onDreamingStarted() {
         super.onDreamingStarted();
-
-        // Força o início das animações assim que o modo de carga ativa na tela
-        startAllFlippers();
-    }
-
-    private void startAllFlippers() {
-        int[] flippers = {
-                R.id.digit1_flipper,
-                R.id.digit2_flipper,
-                R.id.digit3_flipper,
-                R.id.digit4_flipper
-        };
-
-        for (int id : flippers) {
-            ViewFlipper flipper = findViewById(id);
-            if (flipper != null && !flipper.isFlipping()) {
-                flipper.startFlipping();
-            }
-        }
+        handler.post(animationRunnable);
     }
 
     @Override
-    public void onDetachedFromWindow() {
-        super.onDetachedFromWindow();
-        unregisterReceiver(timeReceiver); // Previne vazamento de memória ao sair do modo
+    public void onDreamingStopped() {
+        super.onDreamingStopped();
+        handler.removeCallbacks(animationRunnable);
     }
 
-    private void updateTime() {
-        Calendar c = Calendar.getInstance();
-        int hour = c.get(Calendar.HOUR_OF_DAY);
-        int min = c.get(Calendar.MINUTE);
+    private void atualizarRelogioEAnimacao() {
+        Calendar cal = Calendar.getInstance();
+        int hora = cal.get(Calendar.HOUR_OF_DAY);
+        int minuto = cal.get(Calendar.MINUTE);
 
-        setupFlipperNormal(R.id.digit1_flipper, hour / 10);
-        setupFlipperNormal(R.id.digit2_flipper, hour % 10);
-        setupFlipperNormal(R.id.digit3_flipper, min / 10);
-        setupFlipperNormal(R.id.digit4_flipper, min % 10);
+        int[] digits = { hora / 10, hora % 10, minuto / 10, minuto % 10 };
+        ImageView[] views = { imgH1, imgH2, imgM1, imgM2 };
 
-        TextView dateText = findViewById(R.id.date_text);
-        if (dateText != null) {
-            SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd 'de' MMMM", new Locale("pt", "BR"));
-            dateText.setText(sdf.format(c.getTime()));
-        }
-    }
+        // Animação dinâmica independente para cada dígito
+        for (int i = 0; i < 4; i++) {
+            int digito = digits[i];
+            int totalFrames = FRAME_COUNTS[digito];
 
-    private void setupFlipperNormal(int flipperId, int digit) {
-        ViewFlipper flipper = findViewById(flipperId);
-        if (flipper == null) return;
+            frameIndices[i] = (frameIndices[i] + 1) % totalFrames;
 
-        flipper.removeAllViews();
-        flipper.setFlipInterval(100);
-
-        int[] delays;
-        // Cole aqui o seu bloco "switch (digit)" com os tempos de 100ms a 2000ms
-        switch (digit) {
-            case 0: delays = new int[]{500, 200, 100, 100, 200, 500, 200, 100, 100, 200}; break;
-            default: delays = new int[]{100}; break; // Adicione os outros casos
-        }
-
-        for (int i = 0; i < delays.length; i++) {
-            String frameName = String.format(Locale.US, "digit_%d_%02d", digit, i + 1);
-            int resId = getResources().getIdentifier(frameName, "drawable", getPackageName());
-
-            if (resId != 0) {
-                int repeticoes = delays[i] / 100;
-                for (int r = 0; r < repeticoes; r++) {
-                    // Instancia imagens normais em vez de RemoteViews
-                    ImageView frameView = new ImageView(this);
-                    frameView.setImageResource(resId);
-
-                    // Garante que a imagem respeite os limites do Flipper
-                    frameView.setLayoutParams(new ViewFlipper.LayoutParams(
-                            ViewFlipper.LayoutParams.MATCH_PARENT,
-                            ViewFlipper.LayoutParams.MATCH_PARENT
-                    ));
-
-                    flipper.addView(frameView);
-                }
+            if (views[i] != null) {
+                views[i].setImageResource(getFrameResource(digito, frameIndices[i] + 1));
             }
         }
-        flipper.startFlipping();
+
+        // Pisca os dois pontos do relógio
+        colonVisible = !colonVisible;
+        if (textColon != null) {
+            textColon.setAlpha(colonVisible ? 1.0f : 0.25f);
+        }
+
+        // Exibe a data (ex: dom., 23 de agosto)
+        if (textDate != null) {
+            SimpleDateFormat sdf = new SimpleDateFormat("EEE, d 'de' MMMM", new Locale("pt", "BR"));
+            textDate.setText(sdf.format(new Date()));
+        }
+    }
+
+    private int getFrameResource(int digito, int frame) {
+        String name = String.format(Locale.US, "digit_%d_%02d", digito, frame);
+        return getResources().getIdentifier(name, "drawable", getPackageName());
     }
 }

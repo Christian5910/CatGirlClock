@@ -2,12 +2,12 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#0A131D"
+    android:background="#050B10"
     android:gravity="center"
     android:orientation="vertical"
-    android:padding="12dp">
+    android:padding="24dp">
 
-    <!-- Container dos 4 Dígitos + Dois Pontos -->
+    <!-- Container dos Dígitos -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -29,16 +29,17 @@
             android:layout_weight="1"
             android:scaleType="fitCenter" />
 
+        <!-- Dois Pontos -->
         <TextView
             android:id="@+id/text_colon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingStart="2dp"
-            android:paddingEnd="2dp"
             android:text=":"
-            android:textColor="#FFFFFF"
-            android:textSize="36sp"
-            android:textStyle="bold" />
+            android:textColor="#80FFFFFF"
+            android:textSize="64sp"
+            android:textStyle="bold"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp" />
 
         <ImageView
             android:id="@+id/digit_m1"
@@ -55,13 +56,13 @@
             android:scaleType="fitCenter" />
     </LinearLayout>
 
-    <!-- Data formatada (dom., 23 de agosto) -->
+    <!-- Data (Ex: dom., 23 de agosto) -->
     <TextView
         android:id="@+id/text_date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:textColor="#DDF2FF"
-        android:textSize="14sp" />
+        android:layout_marginTop="12dp"
+        android:textColor="#B0FFFFFF"
+        android:textSize="20sp" />
 
 </LinearLayout>

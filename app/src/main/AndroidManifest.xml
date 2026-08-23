@@ -19,7 +19,7 @@
             </intent-filter>
         </activity>
 
-        <!-- Serviço do Modo de Carga (Daydream) -->
+        <!-- Serviço Daydream -->
         <service
             android:name=".CatGirlDreamService"
             android:exported="true"
@@ -31,42 +31,31 @@
             </intent-filter>
         </service>
 
-        <!-- Widget 4x2 (ClockWidgetProvider) -->
-        <receiver
-            android:name=".ClockWidgetProvider"
-            android:exported="true">
+        <!-- Widgets -->
+        <receiver android:name=".ClockWidgetProvider" android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="android.intent.action.TIME_TICK" />
+                <action android:name="android.intent.action.TIME_SET" />
             </intent-filter>
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/clock_widget_info" />
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/clock_widget_info" />
         </receiver>
 
-        <!-- Widget 4x1 -->
-        <receiver
-            android:name=".Widget4x1"
-            android:exported="true">
+        <receiver android:name=".Widget4x1" android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="android.intent.action.TIME_TICK" />
             </intent-filter>
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/widget_info_4x1" />
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_info_4x1" />
         </receiver>
 
-        <!-- Widget 2x1 -->
-        <receiver
-            android:name=".Widget2x1"
-            android:exported="true">
+        <receiver android:name=".Widget2x1" android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="android.intent.action.TIME_TICK" />
             </intent-filter>
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/widget_info_2x1" />
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_info_2x1" />
         </receiver>
 
     </application>
-
 </manifest>
