@@ -1,19 +1,23 @@
 package com.chris_speccy.catgirlclock;
 
+import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
+import android.appwidget.AppWidgetProviderInfo;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.widget.RemoteViews;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Locale;
 
 public class ClockWidgetProvider extends AppWidgetProvider {
+
+    private static final String ACTION_UPDATE_CLOCK = "com.chris_speccy.catgirlclock.UPDATE_CLOCK";
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
@@ -27,59 +31,122 @@ public class ClockWidgetProvider extends AppWidgetProvider {
         super.onReceive(context, intent);
         String action = intent.getAction();
 
-        // Atualização automática minuto a minuto acionada pelo sistema Android
-        if (Intent.ACTION_TIME_TICK.equals(action) ||
-                Intent.ACTION_TIME_CHANGED.equals(action) ||
-                Intent.ACTION_TIMEZONE_CHANGED.equals(action)) {
+        if (ACTION_UPDATE_CLOCK.equals(action)
+                || Intent.ACTION_TIME_TICK.equals(action)
+                || Intent.ACTION_TIME_CHANGED.equals(action)
+                || Intent.ACTION_TIMEZONE_CHANGED.equals(action)
+                || Intent.ACTION_BOOT_COMPLETED.equals(action)
+                || Intent.ACTION_USER_PRESENT.equals(action)) {
 
             AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
-            ComponentName thisWidget = new ComponentName(context, ClockWidgetProvider.class);
-            int[] appWidgetIds = appWidgetManager.getAppWidgetIds(thisWidget);
 
-            for (int appWidgetId : appWidgetIds) {
-                updateAppWidget(context, appWidgetManager, appWidgetId);
+            atualizarWidgetsDaClasse(context, appWidgetManager, ClockWidgetProvider.class);
+            atualizarWidgetsDaClasse(context, appWidgetManager, Widget4x1.class);
+            atualizarWidgetsDaClasse(context, appWidgetManager, Widget2x1.class);
+        }
+    }
+
+    private void atualizarWidgetsDaClasse(Context context, AppWidgetManager manager, Class<?> clazz) {
+        int[] ids = manager.getAppWidgetIds(new ComponentName(context, clazz));
+        for (int id : ids) {
+            updateAppWidget(context, manager, id);
+        }
+    }
+
+    static void updateAppWidget(Context context, AppWidgetManager appWidgetManager, int appWidgetId) {
+        AppWidgetProviderInfo info = appWidgetManager.getAppWidgetInfo(appWidgetId);
+        int layoutId = (info != null) ? info.initialLayout : R.layout.widget_clock;
+
+        RemoteViews views = new RemoteViews(context.getPackageName(), layoutId);
+
+        Calendar calendar = Calendar.getInstance();
+        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+        int minute = calendar.get(Calendar.MINUTE);
+
+        setupFlipper(context, views, R.id.digit1_flipper, hour / 10);
+        setupFlipper(context, views, R.id.digit2_flipper, hour % 10);
+        setupFlipper(context, views, R.id.digit3_flipper, minute / 10);
+        setupFlipper(context, views, R.id.digit4_flipper, minute % 10);
+
+        if (layoutId == R.layout.widget_clock) {
+            SimpleDateFormat sdf = new SimpleDateFormat("EEE, d 'de' MMMM", new Locale("pt", "BR"));
+            views.setTextViewText(R.id.date_text, sdf.format(calendar.getTime()).toLowerCase());
+        }
+
+        // Clique para atualização manual
+        Intent clickIntent = new Intent(context, ClockWidgetProvider.class);
+        clickIntent.setAction(ACTION_UPDATE_CLOCK);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(
+                context, appWidgetId, clickIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+        );
+        views.setOnClickPendingIntent(R.id.widget_root, pendingIntent);
+
+        // Agenda o próximo minuto automaticamente de forma robusta
+        scheduleNextUpdate(context);
+        appWidgetManager.updateAppWidget(appWidgetId, views);
+    }
+
+    private static void setupFlipper(Context context, RemoteViews views, int flipperId, int digit) {
+        views.removeAllViews(flipperId);
+
+        int[] delays;
+        switch (digit) {
+            case 0: delays = new int[]{500, 200, 100, 100, 200, 500, 200, 100, 100, 200}; break;
+            case 1: delays = new int[]{500, 200, 100, 200, 100, 200, 100, 200, 100}; break;
+            case 2: delays = new int[]{500, 200, 100, 200, 100, 100, 100, 100, 200}; break;
+            case 3: delays = new int[]{500, 100, 200, 500, 100, 200, 500, 100, 200, 500, 100, 200}; break;
+            case 4: delays = new int[]{100, 100, 100, 100, 100, 100, 100, 100, 100, 100}; break;
+            case 5: delays = new int[]{500, 200, 200, 100, 500, 200, 500, 100}; break;
+            case 6: delays = new int[]{100, 100, 200, 100, 100, 100, 100, 200, 100}; break;
+            case 7: delays = new int[]{1000, 200, 200, 1000, 200, 1000, 200, 1000, 200}; break;
+            case 8: delays = new int[]{2000, 100, 200, 200, 100, 500}; break;
+            case 9: delays = new int[]{2000, 100, 1000, 100, 2000, 200, 1000, 100}; break;
+            default: delays = new int[]{100}; break;
+        }
+
+        for (int i = 0; i < delays.length; i++) {
+            String frameName = String.format(Locale.US, "digit_%d_%02d", digit, i + 1);
+            int resId = context.getResources().getIdentifier(frameName, "drawable", context.getPackageName());
+
+            if (resId != 0) {
+                int repeticoes = delays[i] / 100;
+                for (int r = 0; r < repeticoes; r++) {
+                    RemoteViews frameView = new RemoteViews(context.getPackageName(), R.layout.widget_frame);
+                    frameView.setImageViewResource(R.id.frame_image, resId);
+                    views.addView(flipperId, frameView);
+                }
             }
         }
     }
 
-    public static void updateAppWidget(Context context, AppWidgetManager appWidgetManager, int appWidgetId) {
-        RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_clock);
-
-        Calendar cal = Calendar.getInstance();
-        int hora = cal.get(Calendar.HOUR_OF_DAY);
-        int minuto = cal.get(Calendar.MINUTE);
-
-        int h1 = hora / 10;
-        int h2 = hora % 10;
-        int m1 = minuto / 10;
-        int m2 = minuto % 10;
-
-        // Renderiza o primeiro quadro de cada número para a Tela Inicial
-        views.setImageViewResource(R.id.digit_h1, getStaticFrameResource(context, h1));
-        views.setImageViewResource(R.id.digit_h2, getStaticFrameResource(context, h2));
-        views.setImageViewResource(R.id.digit_m1, getStaticFrameResource(context, m1));
-        views.setImageViewResource(R.id.digit_m2, getStaticFrameResource(context, m2));
-
-        // Formata a data (ex: dom., 23 de agosto)
-        SimpleDateFormat sdf = new SimpleDateFormat("EEE, d 'de' MMMM", new Locale("pt", "BR"));
-        views.setTextViewText(R.id.text_date, sdf.format(new Date()));
-
-        // Clique no widget abre a interface do aplicativo
-        Intent intent = new Intent(context, MainActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(
+    private static void scheduleNextUpdate(Context context) {
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(context, ClockWidgetProvider.class);
+        intent.setAction(ACTION_UPDATE_CLOCK);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(
                 context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
         );
 
-        views.setOnClickPendingIntent(R.id.digit_h1, pendingIntent);
-        views.setOnClickPendingIntent(R.id.digit_h2, pendingIntent);
-        views.setOnClickPendingIntent(R.id.digit_m1, pendingIntent);
-        views.setOnClickPendingIntent(R.id.digit_m2, pendingIntent);
+        long now = System.currentTimeMillis();
+        long nextMinute = now + (60000 - (now % 60000));
 
-        appWidgetManager.updateAppWidget(appWidgetId, views);
-    }
-
-    private static int getStaticFrameResource(Context context, int digito) {
-        String name = String.format(Locale.US, "digit_%d_01", digito);
-        return context.getResources().getIdentifier(name, "drawable", context.getPackageName());
+        if (alarmManager != null) {
+            try {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    if (alarmManager.canScheduleExactAlarms()) {
+                        alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, nextMinute, pendingIntent);
+                    } else {
+                        alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, nextMinute, pendingIntent);
+                    }
+                } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, nextMinute, pendingIntent);
+                } else {
+                    alarmManager.setExact(AlarmManager.RTC_WAKEUP, nextMinute, pendingIntent);
+                }
+            } catch (SecurityException e) {
+                // Fallback caso permissões de alarme exato falhem
+                alarmManager.set(AlarmManager.RTC_WAKEUP, nextMinute, pendingIntent);
+            }
+        }
     }
 }

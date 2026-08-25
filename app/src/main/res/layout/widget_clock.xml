@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#0A131D"
-    android:gravity="center"
+    android:background="@android:color/transparent"
     android:orientation="vertical"
-    android:padding="12dp">
+    android:gravity="center"
+    android:padding="24dp">
 
-    <!-- Container dos 4 Dígitos + Dois Pontos -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -15,53 +15,14 @@
         android:gravity="center"
         android:orientation="horizontal">
 
-        <ImageView
-            android:id="@+id/digit_h1"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:scaleType="fitCenter" />
+        <ViewFlipper android:id="@+id/digit1_flipper" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:autoStart="true" android:flipInterval="100" />
+        <ViewFlipper android:id="@+id/digit2_flipper" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:autoStart="true" android:flipInterval="100" />
 
-        <ImageView
-            android:id="@+id/digit_h2"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:scaleType="fitCenter" />
+        <TextView android:id="@+id/colon" android:layout_width="wrap_content" android:layout_height="wrap_content" android:paddingStart="4dp" android:paddingEnd="4dp" android:text=":" android:textSize="48sp" android:textColor="#FFFFFF" android:shadowColor="#000000" android:shadowDx="2" android:shadowDy="2" android:shadowRadius="3" />
 
-        <TextView
-            android:id="@+id/text_colon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingStart="2dp"
-            android:paddingEnd="2dp"
-            android:text=":"
-            android:textColor="#FFFFFF"
-            android:textSize="36sp"
-            android:textStyle="bold" />
-
-        <ImageView
-            android:id="@+id/digit_m1"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:scaleType="fitCenter" />
-
-        <ImageView
-            android:id="@+id/digit_m2"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:scaleType="fitCenter" />
+        <ViewFlipper android:id="@+id/digit3_flipper" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:autoStart="true" android:flipInterval="100" />
+        <ViewFlipper android:id="@+id/digit4_flipper" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:autoStart="true" android:flipInterval="100" />
     </LinearLayout>
 
-    <!-- Data formatada (dom., 23 de agosto) -->
-    <TextView
-        android:id="@+id/text_date"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:textColor="#DDF2FF"
-        android:textSize="14sp" />
-
+    <TextView android:id="@+id/date_text" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:textColor="#FFFFFF" android:textSize="16sp" android:textStyle="bold" android:shadowColor="#000000" android:shadowDx="1" android:shadowDy="1" android:shadowRadius="3" />
 </LinearLayout>

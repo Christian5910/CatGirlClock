@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#0A131D"
+    android:background="#3e3e4a"
     android:fillViewport="true">
 
     <LinearLayout
@@ -12,6 +13,7 @@
         android:padding="20dp"
         android:gravity="center_horizontal">
 
+        <!-- Título principal -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -21,32 +23,79 @@
             android:textStyle="bold"
             android:layout_marginBottom="20dp" />
 
-        <!-- Guia de Recursos -->
+        <!-- Prévia em tempo real das meninas com recuo lateral de 24dp -->
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="#132235"
-            android:padding="16dp"
-            android:layout_marginBottom="20dp">
+            android:layout_height="100dp"
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp"
+            android:layout_marginBottom="20dp"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:background="@android:color/transparent">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="horizontal">
+                <ImageView android:id="@+id/preview_h1" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:scaleType="fitCenter" />
+                <ImageView android:id="@+id/preview_h2" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:scaleType="fitCenter" />
+            </LinearLayout>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="📌 Guia de Uso"
-                android:textColor="#64DFDF"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="8dp" />
+                android:text=":"
+                android:textSize="28sp"
+                android:textColor="#FFFFFF"
+                android:layout_marginStart="6dp"
+                android:layout_marginEnd="6dp" />
 
-            <TextView
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="horizontal">
+                <ImageView android:id="@+id/preview_m1" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:scaleType="fitCenter" />
+                <ImageView android:id="@+id/preview_m2" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:scaleType="fitCenter" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Guia de Recursos -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardBackgroundColor="#132235"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="0dp"
+            android:layout_marginBottom="20dp">
+
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="• Widgets (4x1 / 2x1 / 4x2): Pressione e segure na tela inicial para adicionar. O modelo 4x2 inclui a data completa.\n\n• Modo de Carga (Daydream): Exibe o relógio escurecido em tela cheia enquanto o dispositivo estiver carregando."
-                android:textColor="#C1CBD7"
-                android:textSize="13sp"
-                android:lineSpacingExtra="3dp" />
-        </LinearLayout>
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="📌 Guia de Uso"
+                    android:textColor="#64DFDF"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="8dp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="• Widgets (4x1 / 2x1 / 4x2): Pressione e segure na tela inicial para adicionar. O modelo 4x2 inclui a data completa.\n\n• Modo de Carga (Daydream): Exibe o relógio escurecido em tela cheia enquanto o dispositivo estiver carregando."
+                    android:textColor="#C1CBD7"
+                    android:textSize="13sp"
+                    android:lineSpacingExtra="3dp" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
 
         <!-- Botões de Ação -->
         <Button
@@ -59,67 +108,121 @@
             android:layout_marginBottom="10dp" />
 
         <Button
-            android:id="@+id/btn_add_widget"
+            android:id="@+id/btn_add_4x2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Adicionar Widget à Tela Inicial"
+            android:text="Adicionar Widget (4x2 - Hora e Data)"
+            android:backgroundTint="#1D3557"
+            android:textColor="#FFFFFF"
+            android:layout_marginBottom="10dp" />
+
+        <Button
+            android:id="@+id/btn_add_4x1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Adicionar Widget (4x1 - Hora)"
+            android:backgroundTint="#1D3557"
+            android:textColor="#FFFFFF"
+            android:layout_marginBottom="10dp" />
+
+        <Button
+            android:id="@+id/btn_add_2x1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Adicionar Widget (2x1 - Hora)"
             android:backgroundTint="#1D3557"
             android:textColor="#FFFFFF"
             android:layout_marginBottom="20dp" />
 
-        <!-- Seção do Toggle com Aviso Integrado -->
-        <LinearLayout
+        <!-- Linha Divisória 1 -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginBottom="20dp"
+            android:background="#555566" />
+
+        <!-- Container PIX (Mesma moldura arredondada do Guia de Uso) -->
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="#161B22"
-            android:padding="14dp"
-            android:layout_marginBottom="24dp">
+            app:cardBackgroundColor="#132235"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="0dp"
+            android:layout_marginBottom="20dp">
 
-            <com.google.android.material.switchmaterial.SwitchMaterial
-                android:id="@+id/switch_hide_icon"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Ocultar ícone do app no menu"
-                android:textColor="#FFFFFF"
-                android:textSize="14sp" />
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:gravity="center_horizontal">
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="⚠️ Importante: Ao ocultar, o aplicativo sumirá da sua lista de apps. Para abrir esta tela novamente no futuro, vá em Configurações do Celular > Aplicativos > CatGirl Clock e clique em 'Abrir'."
-                android:textColor="#E0A96D"
-                android:textSize="12sp"
-                android:layout_marginTop="8dp" />
-        </LinearLayout>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="╔═════════════•⊱✦⊰•═════════════╗\n  Me manda um pix?     ฅ^&gt;⩊&lt;^ ฅ\n╚═════════════•⊱✦⊰•═════════════╝"
+                    android:textColor="#64DFDF"
+                    android:textSize="13sp"
+                    android:textAlignment="center"
+                    android:fontFamily="monospace"
+                    android:layout_marginBottom="16dp" />
 
-        <!-- Seção PIX -->
+                <ImageView
+                    android:id="@+id/qr_code_image"
+                    android:layout_width="200dp"
+                    android:layout_height="200dp"
+                    android:src="@drawable/pix_qr"
+                    android:contentDescription="QR Code PIX"
+                    android:scaleType="fitCenter" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Contato / Reportar Bug (com link de e-mail) -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="╔═════════════•⊱✦⊰•═════════════╗\n  Me manda um pix?     ฅ^&gt;⩊&lt;^ ฅ\n╚═════════════•⊱✦⊰•═════════════╝"
+            android:text="Contato ou Reportar Bug:"
+            android:textColor="#C1CBD7"
+            android:textSize="13sp" />
+
+        <TextView
+            android:id="@+id/tv_email_contact"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Christianoliveira5910@gmail.com"
             android:textColor="#64DFDF"
-            android:textSize="13sp"
-            android:textAlignment="center"
-            android:fontFamily="monospace"
-            android:layout_marginBottom="16dp" />
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:padding="6dp"
+            android:layout_marginBottom="20dp" />
 
-        <ImageView
-            android:id="@+id/qr_code_image"
-            android:layout_width="200dp"
-            android:layout_height="200dp"
-            android:src="@drawable/pix_qr"
-            android:contentDescription="QR Code PIX"
-            android:scaleType="fitCenter"
-            android:layout_marginBottom="16dp" />
+        <!-- Linha Divisória 2 -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginBottom="20dp"
+            android:background="#555566" />
 
+        <!-- Crédito Nós Somos o Universo -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="✰+˚. * Somos o Universo! *+˚✧"
-            android:textColor="#8E9AAF"
+            android:text="✰+˚. * Nós Somos o Universo! *+˚✧"
+            android:textColor="#A0A0B0"
             android:textSize="14sp"
-            android:textStyle="italic" />
+            android:textStyle="italic"
+            android:layout_marginBottom="8dp" />
+
+        <!-- Nome e Ano -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Christian de Oliveira Rodrigues - 2026"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:textSize="15sp"
+            android:layout_marginBottom="16dp" />
 
     </LinearLayout>
 </ScrollView>
