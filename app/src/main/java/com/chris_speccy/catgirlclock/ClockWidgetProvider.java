@@ -17,7 +17,7 @@ import java.util.Locale;
 
 public class ClockWidgetProvider extends AppWidgetProvider {
 
-    private static final String ACTION_UPDATE_CLOCK = "com.chris_speccy.catgirlclock.UPDATE_CLOCK";
+    public static final String ACTION_UPDATE_CLOCK = "com.chris_speccy.catgirlclock.UPDATE_CLOCK";
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
@@ -39,7 +39,6 @@ public class ClockWidgetProvider extends AppWidgetProvider {
                 || Intent.ACTION_USER_PRESENT.equals(action)) {
 
             AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
-
             atualizarWidgetsDaClasse(context, appWidgetManager, ClockWidgetProvider.class);
             atualizarWidgetsDaClasse(context, appWidgetManager, Widget4x1.class);
             atualizarWidgetsDaClasse(context, appWidgetManager, Widget2x1.class);
@@ -53,13 +52,17 @@ public class ClockWidgetProvider extends AppWidgetProvider {
         }
     }
 
-    static void updateAppWidget(Context context, AppWidgetManager appWidgetManager, int appWidgetId) {
+    public static void updateAppWidget(Context context, AppWidgetManager appWidgetManager, int appWidgetId) {
         AppWidgetProviderInfo info = appWidgetManager.getAppWidgetInfo(appWidgetId);
         int layoutId = (info != null) ? info.initialLayout : R.layout.widget_clock;
 
         RemoteViews views = new RemoteViews(context.getPackageName(), layoutId);
 
+        // Tolerância de +800ms para compensar despertares antecipados do sistema
+        long nowWithBuffer = System.currentTimeMillis() + 800L;
         Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(nowWithBuffer);
+
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
         int minute = calendar.get(Calendar.MINUTE);
 
@@ -73,7 +76,7 @@ public class ClockWidgetProvider extends AppWidgetProvider {
             views.setTextViewText(R.id.date_text, sdf.format(calendar.getTime()).toLowerCase());
         }
 
-        // Clique para atualização manual
+        // Clique para atualizar
         Intent clickIntent = new Intent(context, ClockWidgetProvider.class);
         clickIntent.setAction(ACTION_UPDATE_CLOCK);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(
@@ -81,7 +84,7 @@ public class ClockWidgetProvider extends AppWidgetProvider {
         );
         views.setOnClickPendingIntent(R.id.widget_root, pendingIntent);
 
-        // Agenda o próximo minuto automaticamente de forma robusta
+        // Agenda exatamente o próximo minuto cravado (+100ms)
         scheduleNextUpdate(context);
         appWidgetManager.updateAppWidget(appWidgetId, views);
     }
@@ -119,7 +122,7 @@ public class ClockWidgetProvider extends AppWidgetProvider {
         }
     }
 
-    private static void scheduleNextUpdate(Context context) {
+    public static void scheduleNextUpdate(Context context) {
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(context, ClockWidgetProvider.class);
         intent.setAction(ACTION_UPDATE_CLOCK);
@@ -128,7 +131,8 @@ public class ClockWidgetProvider extends AppWidgetProvider {
         );
 
         long now = System.currentTimeMillis();
-        long nextMinute = now + (60000 - (now % 60000));
+        // Calcula a virada exata do próximo minuto + 100ms
+        long nextMinute = ((now / 60000L) + 1L) * 60000L + 100L;
 
         if (alarmManager != null) {
             try {
@@ -144,7 +148,6 @@ public class ClockWidgetProvider extends AppWidgetProvider {
                     alarmManager.setExact(AlarmManager.RTC_WAKEUP, nextMinute, pendingIntent);
                 }
             } catch (SecurityException e) {
-                // Fallback caso permissões de alarme exato falhem
                 alarmManager.set(AlarmManager.RTC_WAKEUP, nextMinute, pendingIntent);
             }
         }
